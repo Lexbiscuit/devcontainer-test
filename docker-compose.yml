@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  devcontainer:
+    image: mcr.microsoft.com/devcontainers/typescript-node
+    volumes:
+      - .:/workspace:cached # Mount your project directory
+    command: sleep infinity # Keep the container running
+    ports:
+      - 3000:3000
+    working_dir: /workspace
+    environment:
+      NODE_ENV: development
+    tty: true # Enable TTY for interactive shell access

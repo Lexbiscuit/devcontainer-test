@@ -1,0 +1,87 @@
+---
+- name: Install APT packages
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install necessary packages
+      apt:
+        name:
+          - curl
+          - git
+          - wget
+          - build-essential
+          - ripgrep
+          - fd-find
+        state: present
+
+- name: Install Neovim
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    nvim_version: "v0.11.0"
+    nvim_archive: "nvim-linux-arm64.tar.gz"
+    nvim_url: "https://github.com/neovim/neovim/releases/download/{{ nvim_version }}/{{ nvim_archive }}"
+    nvim_extract_path: "/tmp/nvim"
+    nvim_install_path: "/opt/nvim"
+    nvim_config_repo: "https://github.com/Lexbiscuit/nvim-config.git"
+
+  tasks:
+    - name: Create temporary directory for extraction
+      file:
+        path: "{{ nvim_extract_path }}"
+        state: directory
+        mode: "0755"
+
+    - name: Create install directory
+      file:
+        path: "{{ nvim_install_path }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download Neovim archive
+      get_url:
+        url: "{{ nvim_url }}"
+        dest: "/tmp/{{ nvim_archive }}"
+        mode: "0644"
+
+    - name: Extract Neovim archive
+      unarchive:
+        src: "/tmp/{{ nvim_archive }}"
+        dest: "{{ nvim_extract_path }}"
+        remote_src: yes # important for extracting from a remote source on the target machine
+
+    - name: Move Neovim binary to install directory
+      command: "mv {{ nvim_extract_path }}/nvim-linux-arm64/bin {{ nvim_extract_path }}/nvim-linux-arm64/lib {{ nvim_extract_path }}/nvim-linux-arm64/share {{ nvim_install_path }}/"
+
+    - name: Add Neovim to PATH in .zshrc
+      lineinfile:
+        path: "/home/node/.zshrc"
+        line: 'export PATH="$PATH:{{ nvim_install_path }}/bin"'
+        state: present
+        create: yes # creates the .zshrc if it doesn't already exist
+
+    - name: Clone Neovim configuration repository
+      git:
+        repo: "{{ nvim_config_repo }}"
+        dest: "/home/node/.config/nvim"
+        version: "main"
+        update: yes
+        force: yes # Overwrite any existing files
+
+    - name: Clean up temporary files
+      file:
+        path: "/tmp/{{ nvim_archive }}"
+        state: absent
+
+    - name: Clean up temporary extraction directory
+      file:
+        path: "{{ nvim_extract_path }}"
+        state: absent

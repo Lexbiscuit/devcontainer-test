@@ -1,0 +1,8 @@
+{
+  "name": "Node.js & TypeScript",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace/",
+  "postCreateCommand": "sudo sh /workspace/.devcontainer/start.sh",
+  "remoteUser": "node"
+}
