@@ -1,0 +1,11 @@
+README.md
+commitlint*
+eslint*
+package*.json
+**/*.css
+**/*env*
+**/*.json
+**/*.svg
+vite.config.ts
+**/.gitignore
+**/.prettiergitignore
