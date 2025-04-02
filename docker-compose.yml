@@ -5,6 +5,7 @@ services:
     image: mcr.microsoft.com/devcontainers/typescript-node
     volumes:
       - .:/workspace:cached # Mount your project directory
+      - node_modules:/workspace/node_modules
     command: sleep infinity # Keep the container running
     ports:
       - 3000:3000
@@ -12,3 +13,6 @@ services:
     environment:
       NODE_ENV: development
     tty: true # Enable TTY for interactive shell access
+
+volumes:
+  node_modules:

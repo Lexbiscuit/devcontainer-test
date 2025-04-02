@@ -20,6 +20,26 @@
           - fd-find
         state: present
 
+- name: Install npm packages as node user with correct ownership
+  hosts: localhost
+  connection: local
+  become: true # Become root for ownership and directory creation
+
+  tasks:
+    - name: Ensure node_modules directory exists and has correct ownership
+      file:
+        path: /workspace/node_modules
+        state: directory
+        owner: node
+        group: node
+        mode: "0775" # Or suitable permissions
+
+    - name: Run npm install as node user
+      npm:
+        path: /workspace
+        state: present
+      become_user: node # Run npm install as node
+
 - name: Install Neovim
   hosts: localhost
   connection: local
